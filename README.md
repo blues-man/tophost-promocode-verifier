@@ -8,4 +8,4 @@ Un semplice script per verificare automaticamente la disponiblità di codici sco
 2. Copiarli in un file codici.txt nella stessa cartella dello script
 3. chmod u+x tophost.pl
 4. ./tophost.pl
-5.Bingo!
+5. Bingo!
