@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 ############################################################################
-#    Tophost Code Checker                                                  #
+#    Tophost Promo Code Checker                                            #
 #    Copyright (C) 2014 by Natale Vinto aka bluesman                       #
 #    ebballon@gmail.com                                                    #
 #                                                                          #
@@ -39,7 +39,7 @@ my $url = 'http://www.tophost.it/th/';
 
 if (scalar(@ARGV) > 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help")) {
 
-print "Tophost Code Checker v. $VERSION by bluesman\n";
+print "Tophost Promo Code Checker v. $VERSION by bluesman\n";
 print "./tophost.pl e incolla i tuoi codici, terminando il tutto con CTRL+D\n";
 print "./tophost.pl < codici.txt\n";
 exit;
