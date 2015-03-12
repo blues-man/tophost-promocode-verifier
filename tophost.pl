@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 ############################################################################
-#    Tophost Promo Code Checker                                            #
-#    Copyright (C) 2014 by Natale Vinto aka bluesman                       #
+#    Tophost Promo Code Checker (SSL mai eh? M...)                         #
+#    Copyright (C) 2014-2015 by Natale Vinto aka bluesman                  #
 #    ebballon@gmail.com                                                    #
 #                                                                          #
 #    This program is free software; you can redistribute it and#or modify  #
