@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 ############################################################################
-#    Copyright (C) 2014 by Natale Vinto                                    #
+#    Tophost Code Checker                                                  #
+#    Copyright (C) 2014 by Natale Vinto aka bluesman                       #
 #    ebballon@gmail.com                                                    #
 #                                                                          #
 #    This program is free software; you can redistribute it and#or modify  #
@@ -19,6 +20,7 @@
 #    59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             #
 ############################################################################
 
+# v. 0.2 aggiunto supporto STDIN e controllo indipendente dal rinnovo dei propri domini
 # v. 0.1 molto molto molto molto molto molto molto grezzo 
 
 use LWP::UserAgent;
@@ -29,17 +31,20 @@ use HTML::Entities;
 my $username = ''; # USERNAME TOPHOST.IT
 my $password = ''; # PASSWORD TOPHOST.IT
 
+my $VERSION = '0.2';
+
 
 my $url = 'http://www.tophost.it/th/';
 
-my $file = 'codici.txt';
 
-die("Codici assenti") unless -e $file;
+if (scalar(@ARGV) > 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help")) {
 
-open DAT, $file;
-my @codici = <DAT>;
-close DAT;
+print "Tophost Code Checker v. $VERSION by bluesman\n";
+print "./tophost.pl e incolla i tuoi codici, terminando il tutto con CTRL+D\n";
+print "./tophost.pl < codici.txt\n";
+exit;
 
+}
 
 my $ua        = LWP::UserAgent->new();
 my $cookiejar = HTTP::Cookies->new();
@@ -67,55 +72,51 @@ if ($content =~ /<tr align="left"><td><a href="(.*)" class="mainlevel">Stato deg
     $content = $res->content;
     
 } else {
-  print "Errore login.";
+  print "Errore login. Controlla username e password.\n";
   exit;
  }
+
+$ua->default_header( 'Referer' => 'http://www.tophost.it/oo/02-dominio.php' );
  
-if ($content =~ /<a href="\/oo\/rin-01.php\?dominio=(.*)"></) {
-  my $id = $1;
-  my $url = "http://www.tophost.it/oo/rin-01.php?dominio=$id";
-  $res = $ua->get($url);
-  $content = $res->content;
-  
-} else {
-  print "Errore pagina domini.";
-  exit;
+my @input = <>;
 
-}
+die("Nessun codice passato") if scalar(@input) == 0;
 
-unless ($content =~ /<form action="\/oo\/rin-01.php" method="post" name="forminvcod">/) {
+print "\nRicevuti " . scalar(@input) . " codici, vediamo un po'\n";
 
-  print "Errore pagina rinnovo";
-  exit;
-}
-
-foreach my $codice (@codici) {
+foreach my $codice (@input) {
   $codice =~ s/\n//;
+  if (length($codice) < 13){
+    print "codice $codice non corretto, passo\n";
+    next;
+  }
   print "provo con $codice ..";
-  $res = POST 'http://www.tophost.it/oo/rin-01.php',
+  $res = POST 'http://www.tophost.it/oo/06-validazione.php?pagchiamante=2',
     [
-      invcod     => $codice,
-      chd_invcod => 'includi codice sconto'
+      nomedominio     => '',
+      tld => 'it',
+      pacchetto => 'topweb',
+      qt => '1',
+      pagamento => 'paypal',
+      pagamentor => 'codice',
+      invcod => $codice,
+      Submit => 'avanti'
     ];
-    $content = $ua->request($res)->content;
-
-    if ($content =~ /ATTENZIONE: Il codice di invito inserito risulta gia' utilizzato/){
-	print "no\n";
+    $resp = $ua->request($res);
     
+    if ($resp->is_success) {
+    
+      $content = $ua->request($res)->content;   
+      if ($content =~ /ERRORE: Il codice di invito inserito risulta/){
+         print "no\n";
+      } else {
+         print "Bingo!\t: $codice\n";
+         last;
+      }
     } else {
-    
-	print "Bingo!\t: $codice\n";
-	last;
-    
+      print "Errore di rete, conviene riprovare\n";
+      exit;
     }
     # boni, state boni..
     sleep 1;
 }
-
-
-
-
-
-
- 
- 
